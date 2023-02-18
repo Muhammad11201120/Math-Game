@@ -24,6 +24,7 @@ struct stQuestions
 {
     short questions;
     short level;
+    string Qlevel;
 };
 struct stOperations
 {
@@ -37,10 +38,14 @@ struct stGameChoices
     enLevel level;
     enOperations operation;
     stQuestions questios;
-    int userAnswer;
+    int userAnswer = 0;
     short arr[50];
     short randOperationArr[4];
     short randLevelArr[3];
+    short rightAnswers = 0;
+    short wrongAnswers = 0;
+    short userFinalResult = 0;
+    string operationType = "";
 };
 
 /********************Functions***************************/
@@ -76,25 +81,6 @@ int randNumber(int from, int to)
 {
     int randNum = rand() % (to - from + 1) + from;
     return randNum;
-}
-void randomArrayFromOntToHundred(int arr[], int &arrLength)
-{
-
-    for (int i = 0; i < arrLength; i++)
-    {
-        arr[i] = randNumber(1, 100);
-    }
-}
-short findNumberInArray(int arr[], int indexes, int numberToSearchfor)
-{
-    for (int i = 0; i < indexes; i++)
-    {
-        if (arr[i] == numberToSearchfor)
-        {
-            return i;
-        }
-    }
-    return -1;
 }
 void getNumberOFQuestion(stQuestions questionNumber)
 {
@@ -134,10 +120,12 @@ int mix(int number1, int number2)
         return divi(number1, number2);
     }
 }
-void setModArray(short arr[50], stQuestions level)
+void setModArray(short arr[50], stQuestions &level)
 {
+
     if (level.level == enLevel::Easy)
     {
+        level.Qlevel = "Easy";
         for (int i = 0; i < 50; i++)
         {
             arr[i] = randNumber(1, 20);
@@ -145,6 +133,7 @@ void setModArray(short arr[50], stQuestions level)
     }
     else if (level.level == enLevel::Mid)
     {
+        level.Qlevel = "Mid";
         for (int i = 0; i < 50; i++)
         {
             arr[i] = randNumber(1, 50);
@@ -152,6 +141,7 @@ void setModArray(short arr[50], stQuestions level)
     }
     else if (level.level == enLevel::Hard)
     {
+        level.Qlevel = "Hard";
         for (int i = 0; i < 50; i++)
         {
             arr[i] = randNumber(1, 100);
@@ -159,6 +149,7 @@ void setModArray(short arr[50], stQuestions level)
     }
     else if (level.level == enLevel::levelMix)
     {
+        level.Qlevel = "Mix";
         for (int i = 0; i < 50; i++)
         {
             arr[i] = randNumber(1, 100);
@@ -184,7 +175,7 @@ void wrongAnswer()
     cout << "Result is => ";
     system("color 4F");
 }
-void addResult(stGameChoices gamchoices)
+void addResult(stGameChoices &gamchoices)
 {
 
     cout << "What is The Result of " << gamchoices.arr[0] << " + " << gamchoices.arr[1] << endl;
@@ -192,60 +183,62 @@ void addResult(stGameChoices gamchoices)
     if (gamchoices.userAnswer == gamchoices.arr[0] + gamchoices.arr[1])
     {
         rightAnswer();
-        cout << gamchoices.arr[0] + gamchoices.arr[1];
+        gamchoices.rightAnswers++;
+        cout << add(gamchoices.arr[0], gamchoices.arr[1]);
     }
     else
     {
         wrongAnswer();
-        cout << gamchoices.arr[0] + gamchoices.arr[1];
+        gamchoices.wrongAnswers++;
+        cout << add(gamchoices.arr[0], gamchoices.arr[1]);
     }
 }
-void subResult(stGameChoices gamchoices)
+void subResult(stGameChoices &gamchoices)
 {
     cout << "What is The Result of " << gamchoices.arr[0] << " - " << gamchoices.arr[1] << endl;
     cin >> gamchoices.userAnswer;
     if (gamchoices.userAnswer == gamchoices.arr[0] - gamchoices.arr[1])
     {
         rightAnswer();
-        cout << gamchoices.arr[0] - gamchoices.arr[1];
+        cout << sub(gamchoices.arr[0], gamchoices.arr[1]);
     }
     else
     {
         wrongAnswer();
-        cout << gamchoices.arr[0] - gamchoices.arr[1];
+        cout << sub(gamchoices.arr[0], gamchoices.arr[1]);
     }
 }
-void multResult(stGameChoices gamchoices)
+void multResult(stGameChoices &gamchoices)
 {
     cout << "What is The Result of " << gamchoices.arr[0] << " * " << gamchoices.arr[1] << endl;
     cin >> gamchoices.userAnswer;
     if (gamchoices.userAnswer == gamchoices.arr[0] * gamchoices.arr[1])
     {
         rightAnswer();
-        cout << gamchoices.arr[0] * gamchoices.arr[1];
+        cout << mult(gamchoices.arr[0], gamchoices.arr[1]);
     }
     else
     {
         wrongAnswer();
-        cout << gamchoices.arr[0] * gamchoices.arr[1];
+        cout << mult(gamchoices.arr[0], gamchoices.arr[1]);
     }
 }
-void diviResult(stGameChoices gamchoices)
+void diviResult(stGameChoices &gamchoices)
 {
     cout << "What is The Result of " << gamchoices.arr[0] << " / " << gamchoices.arr[1] << endl;
     cin >> gamchoices.userAnswer;
     if (gamchoices.userAnswer == gamchoices.arr[0] / gamchoices.arr[1])
     {
         rightAnswer();
-        cout << gamchoices.arr[0] / gamchoices.arr[1];
+        cout << divi(gamchoices.arr[0], gamchoices.arr[1]);
     }
     else
     {
         wrongAnswer();
-        cout << gamchoices.arr[0] / gamchoices.arr[1];
+        cout << divi(gamchoices.arr[0], gamchoices.arr[1]);
     }
 }
-void mixResult(stGameChoices gamchoices)
+void mixResult(stGameChoices &gamchoices)
 {
     switch (getMixOperation())
     {
@@ -255,12 +248,12 @@ void mixResult(stGameChoices gamchoices)
         if (gamchoices.userAnswer == gamchoices.arr[0] + gamchoices.arr[1])
         {
             rightAnswer();
-            cout << gamchoices.arr[0] + gamchoices.arr[1];
+            cout << add(gamchoices.arr[0], gamchoices.arr[1]);
         }
         else
         {
             wrongAnswer();
-            cout << gamchoices.arr[0] + gamchoices.arr[1];
+            cout << add(gamchoices.arr[0], gamchoices.arr[1]);
         }
         break;
     case enOperations::Sub:
@@ -269,12 +262,12 @@ void mixResult(stGameChoices gamchoices)
         if (gamchoices.userAnswer == gamchoices.arr[0] - gamchoices.arr[1])
         {
             rightAnswer();
-            cout << gamchoices.arr[0] - gamchoices.arr[1];
+            cout << sub(gamchoices.arr[0], gamchoices.arr[1]);
         }
         else
         {
             wrongAnswer();
-            cout << gamchoices.arr[0] - gamchoices.arr[1];
+            cout << sub(gamchoices.arr[0], gamchoices.arr[1]);
         }
         break;
     case enOperations::Mul:
@@ -283,12 +276,12 @@ void mixResult(stGameChoices gamchoices)
         if (gamchoices.userAnswer == gamchoices.arr[0] * gamchoices.arr[1])
         {
             rightAnswer();
-            cout << gamchoices.arr[0] * gamchoices.arr[1];
+            cout << mult(gamchoices.arr[0], gamchoices.arr[1]);
         }
         else
         {
             wrongAnswer();
-            cout << gamchoices.arr[0] * gamchoices.arr[1];
+            cout << mult(gamchoices.arr[0], gamchoices.arr[1]);
         }
         break;
 
@@ -298,14 +291,25 @@ void mixResult(stGameChoices gamchoices)
         if (gamchoices.userAnswer == gamchoices.arr[0] / gamchoices.arr[1])
         {
             rightAnswer();
-            cout << gamchoices.arr[0] / gamchoices.arr[1];
+            cout << divi(gamchoices.arr[0], gamchoices.arr[1]);
         }
         else
         {
             wrongAnswer();
-            cout << gamchoices.arr[0] / gamchoices.arr[1];
+            cout << divi(gamchoices.arr[0], gamchoices.arr[1]);
         }
         break;
+    }
+}
+void userFinalResult(stGameChoices &gamchoices)
+{
+    if (gamchoices.rightAnswers > gamchoices.wrongAnswers)
+    {
+        cout << "Final Result is Pass :)" << endl;
+    }
+    else
+    {
+        cout << "Final Result is Fail :(" << endl;
     }
 }
 char askToPlayAgain()
@@ -327,7 +331,18 @@ bool PlayAgainOrNot()
         return false;
     }
 }
-void startExam(stGameChoices gamchoices)
+void printFinalResult(stGameChoices &gamchoices)
+{
+    seprator();
+    userFinalResult(gamchoices);
+    seprator();
+    cout << "Questions Level => " << gamchoices.questios.Qlevel << endl;
+    cout << "Operation Type => " << gamchoices.operationType << endl;
+    cout << "Numbers Of Right Answers => " << gamchoices.rightAnswers << endl;
+    cout << "Numbers Of Wrong Answers => " << gamchoices.wrongAnswers << endl;
+    seprator();
+}
+void startExam(stGameChoices &gamchoices)
 {
     system("cls");
     system("color 0F");
@@ -341,32 +356,39 @@ void startExam(stGameChoices gamchoices)
         for (short j = 0; j < gamchoices.questios.questions; j++)
         {
             numberOfQuestions(gamchoices, counter);
+
             if (gamchoices.operation == enOperations::Add)
             {
+                gamchoices.operationType = "Add";
                 setModArray(gamchoices.arr, gamchoices.questios);
                 addResult(gamchoices);
             }
             else if (gamchoices.operation == enOperations::Sub)
             {
+                gamchoices.operationType = "Sub";
                 setModArray(gamchoices.arr, gamchoices.questios);
                 subResult(gamchoices);
             }
             else if (gamchoices.operation == enOperations::Mul)
             {
+                gamchoices.operationType = "Mul";
                 setModArray(gamchoices.arr, gamchoices.questios);
                 multResult(gamchoices);
             }
             else if (gamchoices.operation == enOperations::Divi)
             {
+                gamchoices.operationType = "Divi";
                 setModArray(gamchoices.arr, gamchoices.questios);
                 diviResult(gamchoices);
             }
             else if (gamchoices.operation == enOperations::Mix)
             {
+                gamchoices.operationType = "Mix";
                 setModArray(gamchoices.arr, gamchoices.questios);
                 mixResult(gamchoices);
             }
         }
+        printFinalResult(gamchoices);
         if (!PlayAgainOrNot())
         {
             playAgain = false;
